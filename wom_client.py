@@ -65,3 +65,27 @@ class WomClient:
                 return None
             resp.raise_for_status()
             return await resp.json()
+
+    async def get_player_records(self, username: str, period: Optional[str] = None, metric: Optional[str] = None) -> Optional[list]:
+        """Fetch a player's personal records."""
+        params = {}
+        if period:
+            params["period"] = period
+        if metric:
+            params["metric"] = metric
+        return await self._get(f"/players/{username}/records", params=params or None)
+
+    async def get_player_achievements(self, username: str) -> Optional[list]:
+        """Fetch a player's WOM achievements."""
+        return await self._get(f"/players/{username}/achievements")
+
+    async def get_leaderboard(self, metric: str, period: str = "week", player_type: Optional[str] = None) -> Optional[list]:
+        """Fetch the global records leaderboard for a metric."""
+        params: dict = {"metric": metric, "period": period}
+        if player_type:
+            params["playerType"] = player_type
+        return await self._get("/records/leaderboard", params=params)
+
+    async def get_player_names(self, username: str) -> Optional[list]:
+        """Fetch name change history for a player."""
+        return await self._get(f"/players/{username}/names")
